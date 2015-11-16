@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-
      ,-----.,--.                  ,--. ,---.   ,--.,------.  ,------.
     '  .--./|  | ,---. ,--.,--. ,-|  || o   \  |  ||  .-.  \ |  .---'
     |  |    |  || .-. ||  ||  |' .-. |`..'  |  |  ||  |  \  :|  `--, 
@@ -24,4 +22,8 @@ Once the server is running, open the project in the shape of 'https://projectnam
 =======
 # _imalive_reg
 Registration app for imalive system
->>>>>>> FETCH_HEAD
+=======
+The OpenShift `nodejs` cartridge documentation can be found at:
+
+http://openshift.github.io/documentation/oo_cartridge_guide.html#nodejs
+>>>>>>> b16188ea9cb4e577b1420fa77272dbdba74e6fa5
