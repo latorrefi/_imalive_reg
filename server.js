@@ -22,20 +22,51 @@ var router = express();
 var server = http.createServer(router);
 var io = socketio.listen(server);
 
+var ActiveUsers = require("mongoose/model/activeusers");
+
 router.use(bodyParser.json()); // support json encoded bodies
 //router.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 router.post('/imalive/reg/activeusers',function(req, res) {
     var password = req.body.password;
+    var email = req.body.email;
+    var user = {};
+    user.password = password;
+    user.email = email;
     var result  = "";
-    if(util.isValid(password)){
-      //
-      res.statusCode = 201;
-      result = '{"number": "","password":'+password+'}';
+    if(util.isValid(user)){
+      //Generate a new random Number of ten digit
+      var testUserNumber = {};
+      testUserNumber = Math.floor(1000000000 + Math.random() * 9000000000);
+      // find each ActiveUser with a usernamer :testUserNamber
+      var query = ActiveUsers.findOne({ usernumber: testUserNumber });
+      // selecting the `name` and `occupation` fields
+      query.select('usernumber');
+
+      // execute the query at a later time
+      query.exec(function (err, usernumber) {
+        if (err){
+          return 0;
+        } 
+        if(usernumber===null){
+          var newActiveUser =  new ActiveUsers({usernumber:testUserNumber , password: user.password ,mail:user.email  });
+          newActiveUser.save(function (err) {
+            if (err) {
+    		     res.statusCode = 500;
+    		     return res.send('Internal error');
+            }
+            else  {
+      	      res.statusCode = 201;
+      	      return res.send('/imalive/reg/activeusers/'+testUserNumber);
+            }
+          });
+        }
+      });
     }else{
-      res.statusCode = 400;
+        res.statusCode = 400;
+        return res.send('Invalid data');
     }
-    return res.send(result);
+    
 });
 
 

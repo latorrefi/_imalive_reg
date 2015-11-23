@@ -3,9 +3,14 @@ var validContentType = ["application/json"]
 module.exports = 
 {
 
-isValid : function (password){
+isValid : function (user){
     var isValid = true;
+    var password = user.password;
     if(password.length > passwordLength){
+        isValid = false;
+    }
+    var email = user.email;
+    if(email.indexOf('@')===-1){
         isValid = false;
     }
     return isValid;
