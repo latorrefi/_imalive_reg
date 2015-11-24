@@ -1,9 +1,5 @@
 
-//
-// # SimpleServer
-//
-// A simple chat server using Socket.IO, Express, and Async.
-//
+
 var http = require('http');
 var path = require('path');
 var util = require('./util');
@@ -13,9 +9,6 @@ var socketio = require('socket.io');
 var express = require('express');
 var bodyParser = require('body-parser');
 //
-// ## SimpleServer `SimpleServer(obj)`
-//
-// Creates a new instance of SimpleServer with the following options:
 //  * `port` - The HTTP port to listen on. If `process.env.PORT` is set, _it overrides this value_.
 //
 var router = express();
@@ -33,7 +26,6 @@ router.post('/imalive/reg/activeusers',function(req, res) {
     var user = {};
     user.password = password;
     user.email = email;
-    var result  = "";
     if(util.isValid(user)){
       //Generate a new random Number of ten digit
       var testUserNumber = {};
@@ -46,8 +38,9 @@ router.post('/imalive/reg/activeusers',function(req, res) {
       // execute the query at a later time
       query.exec(function (err, usernumber) {
         if (err){
-          return 0;
-        } 
+          res.statusCode = 500;
+    		  return res.send('Internal error');
+        }
         if(usernumber===null){
           var newActiveUser =  new ActiveUsers({usernumber:testUserNumber , password: user.password ,mail:user.email  });
           newActiveUser.save(function (err) {
@@ -71,12 +64,29 @@ router.post('/imalive/reg/activeusers',function(req, res) {
 
 
 router.get('/imalive/reg/activeusers/:usernumber',function(req, res) {
-    var usernumber = req.params.usernumber;
-    res.statusCode = 404;
-    return res.send('No user created with password '+usernumber);
+    var search_usernumber = req.params.usernumber;
+    var search_password = req.query.password;
+    // find each ActiveUser with a usernamer :testUserNamber
+      var query = ActiveUsers.findOne({ usernumber: search_usernumber,password: search_password});
+      // execute the query at a later time
+      query.exec(function (err, user) {
+        if(err){
+          res.statusCode = 404;
+        }else{
+          if(user===null){
+             res.statusCode = 404;
+             return res.send('No user created with usernamber '+search_usernumber);
+          }else{
+            res.statusCode = 200;
+             return res.send(JSON.stringify(user));
+          }
+        }
+      });
+      
+   
 });
 
 server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function(){
   var addr = server.address();
-  console.log("Chat server listening at", addr.address + ":" + addr.port);
+  console.log("Server listening at", addr.address + ":" + addr.port);
 });
