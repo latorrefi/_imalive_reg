@@ -17,12 +17,13 @@ var io = socketio.listen(server);
 
 var ActiveUsers = require("mongoose/model/activeusers");
 
+
 router.use(bodyParser.json()); // support json encoded bodies
 //router.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
-router.post('/imalive/reg/activeusers',function(req, res) {
+router.post('/imalive/registeredusers',function(req, res) {
     var password = req.body.password;
-    var email = req.body.email;
+    var email = req.body.mail;
     var user = {};
     user.password = password;
     user.email = email;
@@ -63,7 +64,7 @@ router.post('/imalive/reg/activeusers',function(req, res) {
 });
 
 
-router.get('/imalive/reg/activeusers/:usernumber',function(req, res) {
+router.get('/imalive/registeredusers/:usernumber',function(req, res) {
     var search_usernumber = req.params.usernumber;
     var search_password = req.query.password;
     // find each ActiveUser with a usernamer :testUserNamber
@@ -79,6 +80,124 @@ router.get('/imalive/reg/activeusers/:usernumber',function(req, res) {
           }else{
             res.statusCode = 200;
              return res.send(JSON.stringify(user));
+          }
+        }
+      });
+      
+   
+});
+
+/*router.put('/imalive/registeredusers/:usernumber',function(req, res) {
+    var search_usernumber = req.params.usernumber;
+    var search_password = req.query.password;
+    var userToUpdate =req.body;
+    var query = ActiveUsers.findOne({ usernumber: search_usernumber,password:search_password});
+      // execute the query at a later time
+      query.exec(function (err, user) {
+        if(err){
+          res.statusCode = 500;
+          return res.send('Error');
+        }else{
+          if(user===null){
+             res.statusCode = 404;
+             return res.send('No user with usernamber '+search_usernumber);
+          }else{
+            user.password = userToUpdate.password;
+            user.mail = userToUpdate.mail;
+            user.save(function (err) {
+                if (err){
+                   res.statusCode = 500;
+                  return res.send('Error Updating');
+                }else{ 
+                  res.statusCode = 200;
+                  return res.send(JSON.stringify(user));
+                }
+            })
+            
+          }
+        }
+      });
+      
+   
+});*/
+
+
+router.delete('/imalive/registeredusers/:usernumber',function(req, res) {
+    var search_usernumber = req.params.usernumber;
+    var search_password = req.query.password;
+    var query = ActiveUsers.findOne({ usernumber: search_usernumber,password:search_password});
+      // execute the query at a later time
+      query.exec(function (err, user) {
+        if(err){
+          res.statusCode = 500;
+          return res.send('Error');
+        }else{
+          if(user===null){
+             res.statusCode = 404;
+             return res.send('No user with usernamber '+search_usernumber);
+          }else{
+            query.remove(function (err) {
+                if (err){
+                   res.statusCode = 500;
+                  return res.send('Error Updating');
+                }else{ 
+                  res.statusCode = 204;
+                  return res.send();
+                }
+            })
+            
+          }
+        }
+      });
+      
+   
+});
+
+
+router.patch('/imalive/registeredusers/:usernumber',function(req, res) {
+    var search_usernumber = req.params.usernumber;
+    var search_password = req.query.password;
+
+    var update_user = {};
+    update_user.password = req.body.reset_password;
+    update_user.mail = req.body.reset_mail;
+    var query = ActiveUsers.findOne({ usernumber: search_usernumber,password:search_password});
+      // execute the query at a later time
+      query.exec(function (err, user) {
+        if(err){
+          res.statusCode = 500;
+          return res.send('Error');
+        }else{
+          if(user===null){
+             res.statusCode = 404;
+             return res.send('No user with usernamber '+search_usernumber);
+          }else{
+            if(typeof update_user.password !== 'undefined'){
+              if(util.isPasswordValid(update_user)){
+                user.password = update_user.password;
+              }else{
+                res.statusCode = 400;
+                return res.send('Invalid data');
+              }
+            }
+            if (typeof update_user.mail !== 'undefined'){
+              if(util.isMailValid(update_user)){
+                user.mail = update_user.mail;
+              }else{
+                res.statusCode = 400;
+                return res.send('Invalid data');
+              }
+            }
+            user.save(function (err) {
+                if (err){
+                   res.statusCode = 500;
+                  return res.send('Error Updating');
+                }else{ 
+                  res.statusCode = 200;
+                  return res.send(JSON.stringify(user));
+                }
+            })
+            
           }
         }
       });
