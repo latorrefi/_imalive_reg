@@ -7,8 +7,12 @@
   "author": "Filippo La Torre <latorrefi@gmail.com>",
   "dependencies": {
     "async": "~0.2.8",
+    "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.14.1",
+    "crypto": "0.0.3",
     "express": "~3.2.4",
+    "jwt-simple": "^0.4.1",
+    "moment": "^2.11.2",
     "socket.io": "~0.9.14"
   }
 }
